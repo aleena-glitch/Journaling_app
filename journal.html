@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes from Underground</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+  --ease-out: cubic-bezier(0.16,1,0.3,1);
+}
+
+[data-theme="dark"] {
+  --bg: #0e0b07;
+  --bg2: #151009;
+  --surface: #1c1510;
+  --surface2: #241c13;
+  --border: rgba(196,160,90,0.12);
+  --border2: rgba(196,160,90,0.22);
+  --text: #e8dcc8;
+  --text2: #a89070;
+  --text3: #6b5840;
+  --gold: #c4a05a;
+  --gold2: #e8c878;
+  --ink: #e8dcc8;
+  --paper-bg: #1c1510;
+  --line-color: rgba(196,160,90,0.07);
+  --margin-color: rgba(160,100,80,0.12);
+  --wax: #7a1f1f;
+  --wax2: #a02828;
+}
+
+[data-theme="light"] {
+  --bg: #f7f0e3;
+  --bg2: #f0e8d5;
+  --surface: #faf4e8;
+  --surface2: #f2e9d4;
+  --border: rgba(120,80,40,0.12);
+  --border2: rgba(120,80,40,0.25);
+  --text: #2c1e0f;
+  --text2: #6b4c2a;
+  --text3: #9e7a50;
+  --gold: #8b6220;
+  --gold2: #b8860b;
+  --ink: #2c1e0f;
+  --paper-bg: #faf4e8;
+  --line-color: rgba(120,80,40,0.07);
+  --margin-color: rgba(160,80,60,0.12);
+  --wax: #7a1f1f;
+  --wax2: #a02828;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Lora', serif;
+  min-height: 100vh;
+  transition: background 0.5s var(--ease-out), color 0.5s var(--ease-out);
+  overflow-x: hidden;
+}
+
+/* grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ambient glow */
+.glow-1, .glow-2 {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.6s;
+}
+.glow-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(196,160,90,0.06) 0%, transparent 70%);
+  top: -100px; left: -100px;
+  animation: driftA 18s ease-in-out infinite;
+}
+.glow-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(160,80,60,0.04) 0%, transparent 70%);
+  bottom: 0; right: -100px;
+  animation: driftB 22s ease-in-out infinite;
+}
+[data-theme="light"] .glow-1 { background: radial-gradient(circle, rgba(180,130,60,0.08) 0%, transparent 70%); }
+[data-theme="light"] .glow-2 { background: radial-gradient(circle, rgba(160,80,60,0.06) 0%, transparent 70%); }
+
+@keyframes driftA {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(60px,40px) scale(1.1); }
+  66% { transform: translate(-30px,80px) scale(0.95); }
+}
+@keyframes driftB {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-80px,-50px) scale(1.15); }
+}
+
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px 100px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.header-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 14px;
+  animation: fadeSlideDown 0.8s var(--ease-out) both;
+}
+
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 6vw, 58px);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  animation: fadeSlideDown 0.9s 0.1s var(--ease-out) both;
+}
+
+.header h1 em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+.header-rule {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 18px auto 0;
+  max-width: 280px;
+  animation: fadeSlideDown 1s 0.2s var(--ease-out) both;
+}
+.header-rule::before,
+.header-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.4;
+}
+.header-rule span {
+  font-size: 14px;
+  color: var(--gold);
+  opacity: 0.5;
+}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 50;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 40px;
+  padding: 7px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.3s var(--ease-out);
+  backdrop-filter: blur(8px);
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: scale(1.04);
+}
+.theme-icon { font-size: 13px; transition: transform 0.5s var(--ease-spring); }
+.theme-toggle:hover .theme-icon { transform: rotate(20deg); }
+
+/* ── NAV ── */
+.nav {
+  display: flex;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 5px;
+  margin-bottom: 36px;
+  animation: fadeSlideDown 1s 0.3s var(--ease-out) both;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.nav-btn .nav-icon { font-size: 15px; transition: transform 0.3s var(--ease-spring); }
+.nav-btn:hover { color: var(--text2); }
+.nav-btn:hover .nav-icon { transform: scale(1.2); }
+.nav-btn.active {
+  background: var(--surface2);
+  color: var(--text);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.2);
+}
+.nav-btn.active .nav-icon { transform: scale(1.15); }
+
+/* ── PANELS ── */
+.panel { display: none; }
+.panel.active {
+  display: block;
+  animation: panelEnter 0.5s var(--ease-out) both;
+}
+@keyframes panelEnter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PAPER CARD ── */
+.paper-card {
+  background: var(--paper-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 36px 36px 28px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  transition: background 0.5s, border-color 0.5s;
+}
+
+/* ruled lines */
+.paper-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 6px;
+  background: repeating-linear-gradient(
+    transparent 0px,
+    transparent 29px,
+    var(--line-color) 29px,
+    var(--line-color) 30px
+  );
+}
+
+/* margin line */
+.paper-card::before {
+  content: '';
+  position: absolute;
+  left: 68px; top: 0; bottom: 0;
+  width: 1px;
+  background: var(--margin-color);
+  z-index: 1;
+}
+
+/* ── SECTION LABELS ── */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── DATE ── */
+.entry-date-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text3);
+  text-align: right;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── INK ANIMATION ── */
+.ink-title {
+  position: relative;
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.ink-svg {
+  width: 100%;
+  max-width: 400px;
+  height: 100px;
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.ink-path {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  opacity: 0.4;
+  transition: stroke 0.5s;
+}
+
+.ink-path.drawn {
+  animation: inkDraw 3.5s var(--ease-out) forwards;
+}
+
+@keyframes inkDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+.quill {
+  font-size: 32px;
+  display: inline-block;
+  animation: quillFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(196,160,90,0.2));
+}
+
+@keyframes quillFloat {
+  0%,100% { transform: translateY(0) rotate(-5deg); }
+  50%      { transform: translateY(-8px) rotate(-2deg); }
+}
+
+.ink-subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+/* ── MOOD GRID ── */
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 7px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 24px;
+}
+
+.mood-chip {
+  padding: 9px 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+  font-family: 'Lora', serif;
+  font-size: 12px;
+  color: var(--text2);
+  position: relative;
+  overflow: hidden;
+}
+.mood-chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 8px;
+}
+.mood-chip:hover { border-color: var(--border2); color: var(--text); transform: translateY(-2px); }
+.mood-chip.selected {
+  border-color: var(--gold);
+  color: var(--bg);
+  background: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(196,160,90,0.3);
+}
+[data-theme="light"] .mood-chip.selected { color: #fff; }
+.mood-chip .em { display: block; font-size: 17px; margin-bottom: 4px; }
+
+/* ── INPUTS ── */
+.journal-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  line-height: 30px;
+  color: var(--text);
+  resize: none;
+  min-height: 200px;
+  position: relative;
+  z-index: 2;
+  padding: 0 0 0 8px;
+}
+.journal-textarea::placeholder { color: var(--text3); font-style: italic; }
+
+.text-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border2);
+  outline: none;
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--text);
+  padding: 8px 4px;
+  position: relative;
+  z-index: 2;
+  transition: border-color 0.3s;
+}
+.text-input::placeholder { color: var(--text3); font-style: italic; }
+.text-input:focus { border-color: var(--gold); }
+
+.word-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text3);
+  text-align: right;
+  position: relative;
+  z-index: 2;
+  margin: 6px 0 20px;
+}
+
+/* ── BUTTONS ── */
+.btn-primary {
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  padding: 12px 32px;
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s var(--ease-out);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  transform: translateX(-100%);
+  transition: transform 0.4s var(--ease-out);
+}
+.btn-primary:hover::after { transform: translateX(0); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(196,160,90,0.35); }
+.btn-primary:active { transform: scale(0.97); }
+
+.btn-wax {
+  background: var(--wax);
+  color: #f5e6d3;
+  border: none;
+  padding: 12px 32px;
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s var(--ease-out);
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+.btn-wax:hover {
+  background: var(--wax2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(122,31,31,0.4);
+}
+
+.btn-sm {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  padding: 5px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.btn-sm:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── STATS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+  transition: all 0.3s var(--ease-out);
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-style: italic;
+  color: var(--gold);
+  display: block;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+/* ── ENTRY CARDS ── */
+.entries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.entry-card {
+  background: var(--paper-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 18px 14px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+.entry-card::after {
+  content: '';
+  position: absolute;
+  left: 44px; top: 0; bottom: 0;
+  width: 1px;
+  background: var(--margin-color);
+  pointer-events: none;
+}
+.entry-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-4px) rotate(0.3deg);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}
+
+.ec-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.ec-emoji { font-size: 22px; margin-bottom: 8px; display: block; }
+.ec-preview {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ec-tag {
+  margin-top: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--text3);
+}
+.empty-state .em { font-size: 48px; display: block; margin-bottom: 16px; }
+.empty-state p { font-family: 'Lora', serif; font-style: italic; font-size: 15px; }
+
+/* ── TIME CAPSULE ── */
+.capsule-hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.capsule-hourglass {
+  font-size: 52px;
+  display: inline-block;
+  animation: hourglassFloat 5s ease-in-out infinite;
+  filter: drop-shadow(0 6px 16px rgba(196,160,90,0.2));
+}
+@keyframes hourglassFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  30%      { transform: translateY(-10px) rotate(3deg); }
+  70%      { transform: translateY(-5px) rotate(-2deg); }
+}
+.capsule-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 24px;
+  color: var(--text);
+  margin-top: 12px;
+}
+.capsule-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 6px;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 20px;
+}
+.date-row label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.date-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border2);
+  outline: none;
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--text);
+  padding: 8px 4px;
+  transition: border-color 0.3s;
+}
+.date-input:focus { border-color: var(--gold); }
+[data-theme="dark"] .date-input::-webkit-calendar-picker-indicator { filter: invert(0.8); }
+
+/* ── CAPSULE CARDS ── */
+.capsule-card {
+  background: var(--paper-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 22px 24px;
+  margin-bottom: 14px;
+  position: relative;
+  transition: all 0.3s var(--ease-out);
+  overflow: hidden;
+}
+.capsule-card:hover { border-color: var(--border2); }
+
+.capsule-card .seal {
+  position: absolute;
+  right: 20px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  opacity: 0.5;
+  animation: sealPulse 4s ease-in-out infinite;
+}
+@keyframes sealPulse { 0%,100%{opacity:0.5} 50%{opacity:0.8} }
+
+.capsule-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.capsule-name {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.capsule-locked-text {
+  font-size: 14px;
+  color: var(--text3);
+  font-style: italic;
+}
+.capsule-open-text {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  border-left: 2px solid var(--gold);
+  padding-left: 16px;
+  font-style: italic;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+.badge-locked {
+  background: rgba(122,31,31,0.12);
+  color: #c04040;
+  border: 1px solid rgba(122,31,31,0.2);
+}
+.badge-open {
+  background: rgba(196,160,90,0.1);
+  color: var(--gold);
+  border: 1px solid rgba(196,160,90,0.25);
+}
+
+/* ── MOOD GARDEN ── */
+.streak-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dot {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  position: relative;
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s;
+}
+.dot:hover { transform: scale(1.2); box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 2; }
+.dot.filled { border-color: var(--border2); }
+.dot-label {
+  position: absolute;
+  bottom: -18px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: var(--text3);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.bar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  border-radius: 3px;
+  transform-origin: left;
+  animation: barGrow 1s var(--ease-out) both;
+  transition: width 0.8s var(--ease-out);
+}
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.bar-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text3);
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.bar-count {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--gold);
+  min-width: 20px;
+  text-align: right;
+}
+
+/* ── QUOTE ── */
+.quote-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  padding: 18px 22px;
+  margin-top: 20px;
+}
+.quote-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.8;
+}
+.quote-attr {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 10px;
+}
+
+/* ── MODAL ── */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,5,2,0.8);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease both;
+}
+.modal-paper {
+  background: var(--paper-bg);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 36px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalPop 0.4s var(--ease-spring) both;
+}
+@keyframes modalPop {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+.modal-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: none; border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text3);
+  transition: color 0.2s, transform 0.2s;
+}
+.modal-close:hover { color: var(--text); transform: rotate(90deg); }
+.modal-date-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+.modal-emoji { font-size: 32px; display: block; margin-bottom: 10px; }
+.modal-mood-name {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+.modal-content {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  white-space: pre-wrap;
+  border-left: 2px solid var(--border2);
+  padding-left: 18px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 12px 24px;
+  border-radius: 40px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  z-index: 200;
+  transition: transform 0.5s var(--ease-spring);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── SECTION WRAPPER ── */
+.section-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  transition: background 0.5s, border-color 0.5s;
+}
+
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-center   { display: flex; align-items: center; justify-content: center; }
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes fadeSlideDown {
+  from { opacity:0; transform:translateY(-14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity:0; transform:scale(0.85); }
+  to   { opacity:1; transform:scale(1); }
+}
+
+/* entry card stagger */
+.entry-card { animation: scaleIn 0.35s var(--ease-spring) both; }
+
+/* candle */
+.candle { display:inline-block; animation: candleFlicker 3s ease-in-out infinite; }
+@keyframes candleFlicker {
+  0%,100%{opacity:1} 45%{opacity:0.85} 50%{opacity:0.95} 92%{opacity:0.88}
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<button class="theme-toggle" onclick="toggleTheme()">
+  <span class="theme-icon" id="theme-icon">☽</span>
+  <span id="theme-label">light</span>
+</button>
+
+<div class="app">
+
+  <div class="header">
+    <div class="header-eyebrow">a private archive · est. today</div>
+    <h1><span class="candle">🕯</span> Notes from <em>Underground</em></h1>
+    <div class="header-rule"><span>✦</span></div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="switchPanel('journal',this)"><span class="nav-icon">📖</span>journal</button>
+    <button class="nav-btn" onclick="switchPanel('entries',this)"><span class="nav-icon">🫙</span>the jar</button>
+    <button class="nav-btn" onclick="switchPanel('capsule',this)"><span class="nav-icon">⏳</span>capsule</button>
+    <button class="nav-btn" onclick="switchPanel('garden',this)"><span class="nav-icon">🌱</span>garden</button>
+  </div>
+
+  <!-- ── JOURNAL ── -->
+  <div class="panel active" id="panel-journal">
+
+    <div class="ink-title">
+      <svg class="ink-svg" viewBox="0 0 400 100">
+        <path id="ip1" class="ink-path" d="M 30 65 C 60 50 80 80 110 60 C 135 44 155 75 185 55 C 210 38 235 72 265 52 C 290 34 310 68 340 50 C 358 38 372 55 385 48"/>
+        <path id="ip2" class="ink-path" d="M 50 80 C 80 68 110 85 140 74 C 168 64 195 82 225 70 C 252 59 278 80 308 66 C 332 55 358 76 375 65"/>
+        <path id="ip3" class="ink-path" d="M 20 45 C 55 30 85 58 115 40 C 145 22 170 55 205 38 C 235 22 262 52 295 36 C 320 22 350 48 375 35"/>
+      </svg>
+      <span class="quill">🪶</span>
+      <div class="ink-subtitle">write it down · let it breathe</div>
+    </div>
+
+    <div class="paper-card">
+      <div class="entry-date-label" id="today-date"></div>
+
+      <div class="section-label">how are you feeling?</div>
+      <div class="mood-grid">
+        <div class="mood-chip" onclick="pickMood(this,'grateful')"><span class="em">🌸</span>grateful</div>
+        <div class="mood-chip" onclick="pickMood(this,'happy')"><span class="em">☀️</span>happy</div>
+        <div class="mood-chip" onclick="pickMood(this,'anxious')"><span class="em">🌊</span>anxious</div>
+        <div class="mood-chip" onclick="pickMood(this,'sad')"><span class="em">🌧</span>sad</div>
+        <div class="mood-chip" onclick="pickMood(this,'angry')"><span class="em">🔥</span>angry</div>
+        <div class="mood-chip" onclick="pickMood(this,'numb')"><span class="em">🌫</span>numb</div>
+        <div class="mood-chip" onclick="pickMood(this,'hopeful')"><span class="em">🕊</span>hopeful</div>
+        <div class="mood-chip" onclick="pickMood(this,'nostalgic')"><span class="em">🍂</span>nostalgic</div>
+        <div class="mood-chip" onclick="pickMood(this,'tired')"><span class="em">🌙</span>tired</div>
+        <div class="mood-chip" onclick="pickMood(this,'content')"><span class="em">🫧</span>content</div>
+        <div class="mood-chip" onclick="pickMood(this,'excited')"><span class="em">⚡</span>excited</div>
+        <div class="mood-chip" onclick="pickMood(this,'lost')"><span class="em">🌀</span>lost</div>
+      </div>
+
+      <div class="section-label">one word for today</div>
+      <input class="text-input" id="entry-tag" placeholder="healing · chaos · stillness · becoming" maxlength="30" style="margin-bottom:22px">
+
+      <div class="section-label">today's entry</div>
+      <textarea class="journal-textarea" id="journal-text" placeholder="start writing..." oninput="countWords()"></textarea>
+      <div class="word-count" id="wc">0 words</div>
+
+      <div class="flex-between">
+        <button class="btn-primary" onclick="saveEntry()">✦ seal</button>
+        <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3)">saved locally</span>
+      </div>
+    </div>
+
+    <div class="quote-card">
+      <div class="quote-text" id="daily-quote"></div>
+      <div class="quote-attr">— daily reflection</div>
+    </div>
+  </div>
+
+  <!-- ── ENTRIES ── -->
+  <div class="panel" id="panel-entries">
+    <div class="stats-row">
+      <div class="stat-card"><span class="stat-num" id="s-entries">0</span><span class="stat-label">entries</span></div>
+      <div class="stat-card"><span class="stat-num" id="s-streak">0</span><span class="stat-label">day streak</span></div>
+      <div class="stat-card"><span class="stat-num" id="s-words">0</span><span class="stat-label">words</span></div>
+    </div>
+    <div id="entries-out"></div>
+  </div>
+
+  <!-- ── CAPSULE ── -->
+  <div class="panel" id="panel-capsule">
+    <div class="capsule-hero">
+      <span class="capsule-hourglass">⏳</span>
+      <div class="capsule-title">Time Capsule</div>
+      <div class="capsule-sub">seal a letter to your future self</div>
+    </div>
+
+    <div class="paper-card">
+      <div class="section-label">dear future me…</div>
+      <textarea class="journal-textarea" id="capsule-text" placeholder="write what you want your future self to know, remember, or feel…" style="min-height:160px"></textarea>
+
+      <div class="date-row" style="margin-top:16px">
+        <label>open on</label>
+        <input type="date" class="date-input" id="capsule-date">
+      </div>
+
+      <div class="section-label">seal with a title</div>
+      <input class="text-input" id="capsule-title-in" placeholder="when I'm 22 · after graduation · one year from now" style="margin-bottom:24px">
+
+      <button class="btn-wax" onclick="sealCapsule()">🔒 seal with wax</button>
+    </div>
+
+    <div id="capsules-out"></div>
+  </div>
+
+  <!-- ── GARDEN ── -->
+  <div class="panel" id="panel-garden">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="font-size:46px;display:inline-block;animation:quillFloat 4s ease-in-out infinite;filter:drop-shadow(0 6px 18px rgba(196,160,90,0.2))">🌱</div>
+      <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:22px;color:var(--text);margin-top:10px">Your Mood Garden</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--text3);margin-top:6px">one bloom for every entry</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><span class="stat-num" id="g-flowers">0</span><span class="stat-label">blooms</span></div>
+      <div class="stat-card"><span class="stat-num" id="g-top">—</span><span class="stat-label">top mood</span></div>
+      <div class="stat-card"><span class="stat-num" id="g-streak">0</span><span class="stat-label">streak</span></div>
+    </div>
+
+    <div class="section-wrapper" style="margin-bottom:24px">
+      <div class="section-label" style="margin-bottom:20px">last 30 days</div>
+      <div class="streak-grid" id="streak-dots"></div>
+    </div>
+
+    <div class="section-wrapper">
+      <div class="section-label" style="margin-bottom:16px">mood breakdown</div>
+      <div id="mood-bars"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal" style="display:none" onclick="maybeCloseModal(event)">
+  <div class="modal-paper">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-date-label" id="m-date"></div>
+    <span class="modal-emoji" id="m-emoji"></span>
+    <div class="modal-mood-name" id="m-mood"></div>
+    <div class="modal-content" id="m-body"></div>
+    <div style="margin-top:14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)" id="m-tag"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const MOODS = { grateful:'🌸',happy:'☀️',anxious:'🌊',sad:'🌧',angry:'🔥',numb:'🌫',hopeful:'🕊',nostalgic:'🍂',tired:'🌙',content:'🫧',excited:'⚡',lost:'🌀' };
+const QUOTES = [
+  "Writing is thinking. To write well is to think clearly.",
+  "The act of writing is the act of discovering what you believe.",
+  "In the journal I do not just express myself — I create myself.",
+  "One day at a time. Do not look back and grieve over what is gone.",
+  "You are allowed to be both a masterpiece and a work in progress.",
+  "Even the darkest night will end and the sun will rise.",
+  "Journaling is like whispering to one's self and listening at the same time.",
+  "The present moment always will have been.",
+  "Fill your paper with the breathings of your heart."
+];
+
+let activeMood = '';
+
+function init() {
+  const now = new Date();
+  document.getElementById('today-date').textContent =
+    now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('capsule-date').min = tomorrow.toISOString().split('T')[0];
+
+  document.getElementById('daily-quote').textContent =
+    '\u201c' + QUOTES[now.getDate() % QUOTES.length] + '\u201d';
+
+  setTimeout(() => {
+    ['ip1','ip2','ip3'].forEach((id,i) => {
+      setTimeout(() => document.getElementById(id).classList.add('drawn'), i * 500);
+    });
+  }, 300);
+
+  syncThemeUI();
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  html.setAttribute('data-theme', html.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
+  syncThemeUI();
+}
+
+function syncThemeUI() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('theme-icon').textContent = isDark ? '☽' : '☀';
+  document.getElementById('theme-label').textContent = isDark ? 'light' : 'dark';
+}
+
+function switchPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='entries') renderEntries();
+  if(name==='capsule') renderCapsules();
+  if(name==='garden')  renderGarden();
+}
+
+function pickMood(el, mood) {
+  document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  activeMood = mood;
+}
+
+function countWords() {
+  const t = document.getElementById('journal-text').value.trim();
+  const n = t ? t.split(/\s+/).length : 0;
+  document.getElementById('wc').textContent = n + (n===1?' word':' words');
+}
+
+function getEntries()  { try { return JSON.parse(localStorage.getItem('nfu_entries'))  || []; } catch { return []; } }
+function getCapsules() { try { return JSON.parse(localStorage.getItem('nfu_capsules')) || []; } catch { return []; } }
+
+function saveEntry() {
+  const text = document.getElementById('journal-text').value.trim();
+  if(!text)        { toast('write something first'); return; }
+  if(!activeMood)  { toast('pick a mood'); return; }
+  const entries = getEntries();
+  const today = new Date().toISOString().split('T')[0];
+  const tag = document.getElementById('entry-tag').value.trim();
+  entries.unshift({ id:Date.now(), date:today, mood:activeMood, emoji:MOODS[activeMood], text, tag, words:text.split(/\s+/).length });
+  localStorage.setItem('nfu_entries', JSON.stringify(entries));
+  document.getElementById('journal-text').value = '';
+  document.getElementById('entry-tag').value = '';
+  document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
+  activeMood = '';
+  countWords();
+  toast('sealed in the jar ✦');
+}
+
+function calcStreak(entries) {
+  if(!entries.length) return 0;
+  const dates = [...new Set(entries.map(e=>e.date))].sort().reverse();
+  let streak = 0;
+  for(let i=0; i<60; i++) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    if(dates.includes(d.toISOString().split('T')[0])) streak++;
+    else if(i>0) break;
+  }
+  return streak;
+}
+
+function renderEntries() {
+  const entries = getEntries();
+  document.getElementById('s-entries').textContent = entries.length;
+  document.getElementById('s-streak').textContent  = calcStreak(entries);
+  document.getElementById('s-words').textContent   = entries.reduce((a,e)=>a+(e.words||0),0);
+  const out = document.getElementById('entries-out');
+  if(!entries.length) { out.innerHTML = '<div class="empty-state"><span class="em">🫙</span><p>the jar is empty — write your first entry</p></div>'; return; }
+  let h = '<div class="entries-grid">';
+  entries.forEach((e,i) => {
+    const ds = new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+    h += `<div class="entry-card" style="animation-delay:${i*0.04}s" onclick="openEntry(${i})">
+      <div class="ec-date">${ds}</div>
+      <span class="ec-emoji">${e.emoji}</span>
+      <div class="ec-preview">${e.text}</div>
+      ${e.tag?`<div class="ec-tag">✦ ${e.tag}</div>`:''}
+      <button class="btn-sm" style="margin-top:12px" onclick="deleteEntry(event,${i})">remove</button>
+    </div>`;
+  });
+  h += '</div>';
+  out.innerHTML = h;
+}
+
+function openEntry(i) {
+  const e = getEntries()[i];
+  const ds = new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  document.getElementById('m-date').textContent = ds;
+  document.getElementById('m-emoji').textContent = e.emoji;
+  document.getElementById('m-mood').textContent = e.mood;
+  document.getElementById('m-body').textContent = e.text;
+  document.getElementById('m-tag').textContent = e.tag ? '✦ '+e.tag : '';
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function deleteEntry(ev,i) {
+  ev.stopPropagation();
+  const entries = getEntries(); entries.splice(i,1);
+  localStorage.setItem('nfu_entries', JSON.stringify(entries));
+  renderEntries(); toast('entry removed');
+}
+
+function closeModal() { document.getElementById('modal').style.display='none'; }
+function maybeCloseModal(e) { if(e.target.id==='modal') closeModal(); }
+
+function sealCapsule() {
+  const text  = document.getElementById('capsule-text').value.trim();
+  const date  = document.getElementById('capsule-date').value;
+  const title = document.getElementById('capsule-title-in').value.trim() || 'a letter to myself';
+  if(!text) { toast('write something first'); return; }
+  if(!date) { toast('pick an unlock date'); return; }
+  const caps = getCapsules();
+  caps.unshift({ id:Date.now(), text, openDate:date, title, sealed:new Date().toISOString().split('T')[0] });
+  localStorage.setItem('nfu_capsules', JSON.stringify(caps));
+  document.getElementById('capsule-text').value = '';
+  document.getElementById('capsule-date').value = '';
+  document.getElementById('capsule-title-in').value = '';
+  renderCapsules(); toast('sealed with wax 🔒');
+}
+
+function renderCapsules() {
+  const caps = getCapsules(); const today = new Date().toISOString().split('T')[0];
+  const out = document.getElementById('capsules-out');
+  if(!caps.length) { out.innerHTML = '<div class="empty-state"><span class="em">⏳</span><p>no capsules yet — write to your future self</p></div>'; return; }
+  let h = '';
+  caps.forEach((c,i) => {
+    const canOpen = today >= c.openDate;
+    const openStr = new Date(c.openDate+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    const sealStr = new Date(c.sealed+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+    h += `<div class="capsule-card" style="animation-delay:${i*0.07}s">
+      <div class="seal">${canOpen?'🗝':'🕯'}</div>
+      <div class="capsule-meta">sealed ${sealStr}</div>
+      <div class="capsule-name">${c.title}</div>
+      ${canOpen
+        ? `<div class="capsule-open-text">${c.text}</div><div class="badge badge-open">✦ opened · ${openStr}</div>
+           <button class="btn-sm" style="margin-top:10px" onclick="deleteCapsule(${i})">remove</button>`
+        : `<div class="capsule-locked-text">locked until ${openStr}…</div><div class="badge badge-locked">🔒 opens ${openStr}</div>`
+      }
+    </div>`;
+  });
+  out.innerHTML = h;
+}
+
+function deleteCapsule(i) {
+  const caps = getCapsules(); caps.splice(i,1);
+  localStorage.setItem('nfu_capsules', JSON.stringify(caps));
+  renderCapsules(); toast('capsule removed');
+}
+
+function renderGarden() {
+  const entries = getEntries(); const today = new Date();
+  document.getElementById('g-flowers').textContent = entries.length;
+  document.getElementById('g-streak').textContent  = calcStreak(entries);
+  const entryMap = {};
+  entries.forEach(e => { if(!entryMap[e.date]) entryMap[e.date]=e; });
+
+  let dots = '';
+  for(let i=29;i>=0;i--) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().split('T')[0];
+    const e = entryMap[ds];
+    const day = d.toLocaleDateString('en-US',{weekday:'short'}).charAt(0);
+    dots += `<div class="dot ${e?'filled':''}" title="${ds}">${e?e.emoji:''}<span class="dot-label">${day}</span></div>`;
+  }
+  document.getElementById('streak-dots').innerHTML = dots;
+
+  if(!entries.length) {
+    document.getElementById('g-top').textContent = '—';
+    document.getElementById('mood-bars').innerHTML = '<p style="font-family:DM Mono,monospace;font-size:10px;letter-spacing:2px;color:var(--text3);text-align:center;padding:24px 0">start journaling to see your mood patterns</p>';
+    return;
+  }
+  const counts = {};
+  entries.forEach(e => { counts[e.mood]=(counts[e.mood]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('g-top').textContent = MOODS[sorted[0][0]] || sorted[0][0];
+  const max = sorted[0][1];
+  let bars = '';
+  sorted.forEach(([mood,count]) => {
+    const pct = Math.round((count/max)*100);
+    bars += `<div class="bar-row">
+      <div class="bar-label"><span>${MOODS[mood]}</span>${mood}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-count">${count}</div>
+    </div>`;
+  });
+  document.getElementById('mood-bars').innerHTML = bars;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+init();
+</script>
+</body>
+</html>
